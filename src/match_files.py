@@ -31,7 +31,7 @@ def get_file_list_dict(folder_location, file_extension):
     for dirpath, _, filenames in os.walk(folder_location):
         for filen in filenames:
             if filen not in file_list_dict and filen.endswith(file_extension):
-                file_list_dict[file] = os.path.join(dirpath, filen)
+                file_list_dict[filen] = os.path.join(dirpath, filen)
     return file_list_dict
 
 
@@ -91,7 +91,7 @@ def is_content_same(file1, file2, block_size=32768):
 
 
 def copy_files(filepath_list, location_to_store):
-    if not os.path.exists(location_to_store):
+    if not os.path.isdir(location_to_store):
         os.makedirs(location_to_store)
     for filen in filepath_list:
         shutil.copy2(filen, location_to_store)
@@ -103,17 +103,26 @@ def main():
     folder2_file_dict = get_file_list_dict(folder2, file_extension)
     common_files, present_in_1_not_in_2 = get_common_files(folder1_file_dict.keys(), folder2_file_dict.keys(),
                                                            get_difference=True)
+    _, present_in_2_not_in_1 = get_common_files(folder2_file_dict.keys(), folder1_file_dict.keys(), get_difference=True)
     common_and_same_content = []
     common_and_different_content_1 = []
     common_and_different_content_2 = []
+    in_1_not_in_2 = []
+    in_2_not_in_1 = []
     for filen in common_files:
         if is_content_same(folder1_file_dict[filen], folder2_file_dict[filen]):
             common_and_same_content.append(folder1_file_dict[filen])
         else:
             common_and_different_content_1.append(folder1_file_dict[filen])
             common_and_different_content_2.append(folder2_file_dict[filen])
+    for filen in present_in_1_not_in_2:
+        in_1_not_in_2.append(folder1_file_dict[filen])
+    for filen in present_in_2_not_in_1:
+        in_2_not_in_1.append(folder2_file_dict[filen])
     copy_files(common_and_same_content, location_to_store+'common_and_same_content/')
     copy_files(common_and_different_content_1, location_to_store+'common_and_different_content_1/')
     copy_files(common_and_different_content_2, location_to_store+'common_and_different_content_2/')
+    copy_files(in_1_not_in_2, location_to_store+'in_1_not_in_2/')
+    copy_files(in_2_not_in_1, location_to_store+'in_2_not_in_1/')
 if __name__ == "__main__":
     main()
