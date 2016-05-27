@@ -98,18 +98,28 @@ def copy_files(filepath_list, location_to_store):
 
 
 def main():
+    print 'reading arguments'
     folder1, folder2, file_extension, location_to_store = define_argument_parsing()
+    print 'extracting file list for folder 1'
     folder1_file_dict = get_file_list_dict(folder1, file_extension)
+    print 'extracting file list for folder 2'
     folder2_file_dict = get_file_list_dict(folder2, file_extension)
+    print 'getting common files, and files in folder 1 but not in 2'
     common_files, present_in_1_not_in_2 = get_common_files(folder1_file_dict.keys(), folder2_file_dict.keys(),
                                                            get_difference=True)
+    print 'getting files in folder 2 but not in 1'
     _, present_in_2_not_in_1 = get_common_files(folder2_file_dict.keys(), folder1_file_dict.keys(), get_difference=True)
     common_and_same_content = []
     common_and_different_content_1 = []
     common_and_different_content_2 = []
     in_1_not_in_2 = []
     in_2_not_in_1 = []
+    idx = 1
+    n = len(common_files)
+    print 'Checking content matches for common files'
     for filen in common_files:
+        print 'On file '+str(idx)+'/'+str(n)
+        idx += 1
         if is_content_same(folder1_file_dict[filen], folder2_file_dict[filen]):
             common_and_same_content.append(folder1_file_dict[filen])
         else:
@@ -119,10 +129,15 @@ def main():
         in_1_not_in_2.append(folder1_file_dict[filen])
     for filen in present_in_2_not_in_1:
         in_2_not_in_1.append(folder2_file_dict[filen])
+    print 'Copying common files with same content'
     copy_files(common_and_same_content, location_to_store+'common_and_same_content/')
+    print 'Copying common files with different content'
     copy_files(common_and_different_content_1, location_to_store+'common_and_different_content_1/')
     copy_files(common_and_different_content_2, location_to_store+'common_and_different_content_2/')
+    print 'Copying files in 1 but not in 2'
     copy_files(in_1_not_in_2, location_to_store+'in_1_not_in_2/')
+    print 'Copying files in 2 but not in 1'
     copy_files(in_2_not_in_1, location_to_store+'in_2_not_in_1/')
+    print 'TADAA!!!'
 if __name__ == "__main__":
     main()
